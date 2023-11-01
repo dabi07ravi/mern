@@ -1,15 +1,14 @@
-
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
-import {
-    BrowserRouter
-  } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
+import { ToDoProvider } from "./context/mainContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
+  <ToDoProvider>
     <BrowserRouter>
-    <App />
+      <App />
     </BrowserRouter>
-
+  </ToDoProvider>
 );
