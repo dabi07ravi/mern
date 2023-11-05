@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
@@ -6,15 +6,21 @@ import axios from "axios";
 import { URL } from "../url";
 
 
+
 const Profile = () => {
   const {id} = useParams();
   const [User,setUser] = useState();
+  const [email, setEmail] = useState("");
+  const [username,setUsername] = useState("")
+  const usenavigate = useNavigate();
   useEffect(() => {
     const userFetch = async () => {
       try {
               const res = await axios.get(URL + "/api/users/" + id);
               if(res.data){
-                setUser(res.data)
+                setUser(res.data);
+                setEmail(res.data.email);
+                setUsername(res.data.username);
               }
       } catch (error) {
             console.log("error while fetching using users in profile" + error,message)
@@ -22,6 +28,26 @@ const Profile = () => {
     }
     userFetch()
   },[id])
+
+  const updateHandler = async () => {
+    try {
+        await axios.put(URL + "/api/users/" + id, {username,email}, {withCredentials:true})
+        setEmail("")
+        setUsername("")
+        usenavigate(`/profile/${id}`)
+    } catch (error) {
+        console.log("error while updating the user" + error.message)
+    }
+  }
+
+  const delHandler = async() => {
+    try {
+        await axios.delete(URL + "/api/users/" + id, {withCredentials : true})
+        useNavigate("/")
+    } catch (error) {
+        console.log("error while deleting the user" + error.message)
+    }
+  }
   return ( 
     <div>
       <Navbar />
@@ -37,18 +63,22 @@ const Profile = () => {
               className="outline-none px-4 py-2 text-gray-500"
               placeholder="Your username"
               type="text"
+              onChange={(e) => setUsername(e.target.value)}
+              value={username}
             />
             <input
               className="outline-none px-4 py-2 text-gray-500"
               placeholder="Your email"
               type="email"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
             />
             {/* <input onChange={(e)=>setPassword(e.target.value)} value={password} className="outline-none px-4 py-2 text-gray-500" placeholder="Your password" type="password"/> */}
             <div className="flex items-center space-x-4 mt-8">
-              <button className="text-white font-semibold bg-black px-4 py-2 hover:text-black hover:bg-gray-400">
+              <button onClick={updateHandler} className="text-white font-semibold bg-black px-4 py-2 hover:text-black hover:bg-gray-400">
                 Update
               </button>
-              <button className="text-white font-semibold bg-black px-4 py-2 hover:text-black hover:bg-gray-400">
+              <button onClick={delHandler} className="text-white font-semibold bg-black px-4 py-2 hover:text-black hover:bg-gray-400">
                 Delete
               </button>
             </div>
